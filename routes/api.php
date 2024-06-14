@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('storeExcercise', [ExcerciseController::class, 'storeExcercise']);
     Route::post('storeEquipment', [EquipmentController::class, 'storeEquipment']);
     Route::get('getBodyListAndEquipments', [BodyTargetController::class, 'getBodyListAndEquipments']);
-    
+    Route::post('storeExcercise', [ExcerciseController::class, 'storeExcercise']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
