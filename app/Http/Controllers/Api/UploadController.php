@@ -12,7 +12,7 @@ class UploadController extends Controller
         $image = $request->file("file");
         if ($request->hasFile("file")) {
             //$imagePath = base_path().'/../public_html/uploads/imani/images/';
-            $imagePath = public_path('uploads/microcredit/images/');
+            $imagePath = public_path('uploads/kuafit/images/');
             $new_name = rand() . $image->getClientOriginalName();
             $image->move($imagePath, $new_name);
             //return response()->json('https://database.co.tz/uploads/imani/images/' . $new_name);

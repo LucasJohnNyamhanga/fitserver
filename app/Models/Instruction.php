@@ -12,7 +12,7 @@ class Instruction extends Model
 
     public function exercises():BelongsTo
     {
-        return $this->belongsTo(Exercises::class);
+        return $this->belongsTo(Exercise::class);
     }
     protected $fillable = [
         'maelezo',

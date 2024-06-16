@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('storeEquipment', [EquipmentController::class, 'storeEquipment']);
     Route::get('getBodyListAndEquipments', [BodyTargetController::class, 'getBodyListAndEquipments']);
     Route::post('storeExcercise', [ExcerciseController::class, 'storeExcercise']);
+    Route::get('getBodyListWithExercise', [BodyTargetController::class, 'getBodyListWithExercise']);
 });
 
 Route::post('login', [AuthController::class, 'login']);

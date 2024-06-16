@@ -6,57 +6,71 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ExcerciseRequest;
 use App\Models\Exercise;
 use App\Models\Instruction;
+use Illuminate\Support\Facades\Validator;
 
 class ExcerciseController extends Controller
 {
     public function storeExcercise(ExcerciseRequest $request)
     {
-        $jina = $request->name;
-        $maelezo = $request->details;
-        $ugumu = $request->difficulty;
-        $muda = $request->time;
-        $picha = $request->image;
-        $maelekezo = $request->instructions; // array
-        $muscleName = $request->muscleName;
-        $bodyPartIds = $request->bodyPartIds; // array
-        $equipmentIds = $request->equipmentIds; // array
+         $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'details' => 'required|string',
+        'difficulty' => 'required|string',
+        'time' => 'required|string',
+        'image' => 'required|string',
+        'instructions' => 'required|array',
+        'muscleName' => 'required|string',
+        'bodyPartIds' => 'required|array',
+        'equipmentIds' => 'required|array',
+    ]);
 
-        // Check for empty fields
-        if (empty($jina) || empty($maelezo) || empty($ugumu) || empty($muda) || empty($picha) || empty($maelekezo) || empty($muscleName) || empty($bodyPartIds) || empty($equipmentIds)) {
-            return response()->json(['message' => 'Fill in all empty fields'], 400);
-        }
+    if ($validator->fails()) {
+        return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+    }
+
+        $name = $request->input('name');
+        $details = $request->input('details');
+        $difficulty = $request->input('difficulty');
+        $time = $request->input('time');
+        $image = $request->input('image');
+        $instructions = $request->input('instructions');
+        $muscleName = $request->input('muscleName');
+        $bodyPartIds = $request->input('bodyPartIds');
+        $equipmentIds = $request->input('equipmentIds');
 
         // Check for existing exercise
-        $existingExcercise = Exercise::where('jina', $jina)->first();
-        if ($existingExcercise) {
+        $existingExercise = Exercise::where('jina', $name)->first();
+        if ($existingExercise) {
             return response()->json(['message' => 'Exercise already available.'], 409);
         }
 
         // Create the exercise
-        $excercise = Exercise::create([
-            'jina' => $jina,
-            'maelezo' => $maelezo,
-            'ugumu' => $ugumu,
-            'muda' => $muda,
-            'picha' => $picha,
+        $exercise = Exercise::create([
+            'jina' => $name,
+            'maelezo' => $details,
+            'ugumu' => $difficulty,
+            'muda' => $time,
+            'picha' => $image,
             'muscleName' => $muscleName,
         ]);
 
-        // Attach body parts
-        $excercise->bodyTarget()->attach($bodyPartIds);
+        // Attach body parts and equipment
+        foreach ($bodyPartIds as $bodyPartId) {
+            $exercise->bodyTarget()->attach($bodyPartId);
+        }
 
-        // Attach equipment
-        $excercise->equipment()->attach($equipmentIds);
+        foreach ($equipmentIds as $equipmentId) {
+            $exercise->equipment()->attach($equipmentId);
+        }
 
         // Create instructions
-        foreach ($maelekezo as $inst) {
+        foreach ($instructions as $instruction) {
             Instruction::create([
-                'maelezo' => $inst,
-                'exercise_id' => $excercise->id,
+                'maelezo' => $instruction,
+                'exercise_id' => $exercise->id,
             ]);
         }
 
         return response()->json(['message' => 'Exercise has been successfully saved to database.'], 200);
     }
-
 }

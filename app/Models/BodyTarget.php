@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BodyTarget extends Model
 {
@@ -13,7 +12,7 @@ class BodyTarget extends Model
 
     public function exercises():BelongsToMany
     {
-        return $this->belongsToMany(Exercises::class);
+        return $this->belongsToMany(Exercise::class);
     }
 
     protected $fillable = [

@@ -12,7 +12,7 @@ class Equipment extends Model
 
     public function exercises(): BelongsToMany
     {
-        return $this->belongsToMany(Exercises::class, 'equipment_excercise', 'equipment_id', 'excercise_id');
+        return $this->belongsToMany(Exercise::class);
     }
 
     protected $fillable = [

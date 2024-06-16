@@ -39,4 +39,13 @@ class BodyTargetController extends Controller
         $equipment = Equipment::all();
         return response()->json(['bodyTarget' => $bodyTarget, 'equipment' => $equipment], 200);
     }
+
+    public function getBodyListWithExercise(BodyTypeRequest $request)
+    {
+        $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
+                $query->latest()->take(4);
+            }])
+            ->get();
+        return response()->json(['bodyTarget' => $bodyTarget,], 200);
+    }
 }

@@ -23,7 +23,7 @@ class Exercise extends Model
 
     public function bodyTarget():BelongsToMany
     {
-         return $this->belongsToMany(BodyTarget::class);
+        return $this->belongsToMany(BodyTarget::class);
     }
 
     protected $fillable = [
