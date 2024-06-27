@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BodyTypeRequest;
 use App\Models\BodyTarget;
 use App\Models\Equipment;
+use App\Models\Meal;
+use App\Models\Package;
 use Illuminate\Http\Request;
 
 class BodyTargetController extends Controller
@@ -43,9 +45,23 @@ class BodyTargetController extends Controller
     public function getBodyListWithExercise(BodyTypeRequest $request)
     {
         $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
-                $query->latest()->take(4);
+                $query->latest()->take(5);
             }])
             ->get();
-        return response()->json(['bodyTarget' => $bodyTarget,], 200);
+
+            $dietary = Package::where('target', 'Dietary')
+            ->latest()->take(4)
+            ->get();
+
+            $transformation = Package::where('target', 'Transformation')
+            ->latest()->take(4)
+            ->get();
+
+
+        return response()->json([
+            'bodyTarget' => $bodyTarget,
+            'dietary'=> $dietary,
+            'transformation'=> $transformation,
+        ], 200);
     }
 }

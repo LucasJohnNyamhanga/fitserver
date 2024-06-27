@@ -26,6 +26,11 @@ class Exercise extends Model
         return $this->belongsToMany(BodyTarget::class);
     }
 
+    public function packages():BelongsToMany
+    {
+        return $this->belongsToMany(Package::class);
+    }
+
     protected $fillable = [
         'jina',
         'maelezo',
