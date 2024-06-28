@@ -68,4 +68,34 @@ class PackageController extends Controller
             return response()->json(['message' => 'An error occurred while fetching the package. '. $e->getMessage()], 500);
         }
     }
+
+    public function addExerciseToPackage(PackageRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'packageId' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+        $ids = $request->input('ids');
+        $packageId = $request->input('packageId');
+
+        $package = Package::find($packageId);
+
+        if (!$package) {
+            return response()->json(['message' => 'Package not found.'], 404);
+        }
+
+        foreach ($ids as $exerciseId) {
+            if ($package->exercises()->where('exercise_id', $exerciseId)->doesntExist()) {
+                $package->exercises()->attach($exerciseId);
+            }
+        }
+
+        return response()->json(['message' => 'Exercises have been successfully added to the package.'], 200);
+    }
+
 }

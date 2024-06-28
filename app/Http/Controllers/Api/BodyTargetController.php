@@ -64,4 +64,16 @@ class BodyTargetController extends Controller
             'transformation'=> $transformation,
         ], 200);
     }
+
+
+    public function getBodyListWithExerciseForPicking(BodyTypeRequest $request)
+    {
+        $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
+                $query->latest();
+            }])
+            ->get();
+        return response()->json([
+            'bodyTarget' => $bodyTarget,
+        ], 200);
+    }
 }

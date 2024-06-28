@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('meals', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('detail');
+            $table->longText('detail');
             $table->unsignedBigInteger('package_id');
             $table->foreign('package_id')->references('id')->on('packages')->onDelete('cascade');
             $table->timestamps();

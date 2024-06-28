@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\ExcerciseController;
 use App\Http\Controllers\Api\InstructionController;
+use App\Http\Controllers\Api\MealController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\UploadController;
 use Illuminate\Http\Request;
@@ -26,6 +27,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('storePackage', [PackageController::class, 'storePackage']);
     Route::get('getPackagesForSelection', [PackageController::class, 'getPackagesForSelection']);
     Route::get('getPackageWithDetails', [PackageController::class, 'getPackageWithDetails']);
+    Route::post('storeMeal', [MealController::class, 'storeMeal']);
+    Route::get('getBodyListWithExerciseForPicking', [BodyTargetController::class, 'getBodyListWithExerciseForPicking']);
+    Route::post('addExerciseToPackage', [PackageController::class, 'addExerciseToPackage']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
