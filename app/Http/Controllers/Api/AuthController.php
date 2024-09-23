@@ -59,10 +59,13 @@ class AuthController extends Controller
         if (empty($username) || empty($password)) {
             return response()->json(['message' => 'Jaza nafasi zote zilizo wazi.'], 401);
         }
+
+       
         
         $user = User::query()->where("username", $username)->first();
         
         if ($user) {
+            
             $passwordDatabase = $user->password;
             if ($password == $passwordDatabase) {
                 // Password matches, do something (e.g., log in the user)
