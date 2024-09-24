@@ -24,7 +24,18 @@ class User extends Authenticatable
         'active',
         'role',
         'password',
+        'gender',
+        'goal',
+        'age',
+        'height',
+        'weight',
+        'targetWeight',
+        'health',
+        'fitnessLevel',
+        'strength',
+        'fatStatus'
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
