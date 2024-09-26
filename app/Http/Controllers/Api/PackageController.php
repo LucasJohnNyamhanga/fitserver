@@ -16,6 +16,7 @@ class PackageController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'image' => 'required|string',
+            'description' => 'required|string',
             'type' => 'required|string',
             'price' => 'required|string',
             
@@ -26,6 +27,7 @@ class PackageController extends Controller
         }
 
         $title = $request->input('title');
+        $description = $request->input('description');
         $image = $request->input('image');
         $target = $request->input('type');
         $price = $request->input('price');
@@ -39,6 +41,7 @@ class PackageController extends Controller
         // Create the exercise
         $exercise = Package::create([
             'title' => $title,
+            'description' => $description,
             'image' => $image,
             'target' => $target,
             'price' => $price,
