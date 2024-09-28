@@ -15,16 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('fullname');
             $table->string('mobile');
-            $table->string('gender');
-            $table->string('goal');
-            $table->integer('age');
-            $table->integer('height');
-            $table->integer('weight');
-            $table->integer('targetWeight');
-            $table->string('health');
-            $table->string('fitnessLevel');
-            $table->string('strength');
-            $table->string('fatStatus');
             $table->string('username')->unique();
             $table->boolean('active')->default(false);
             $table->string('role')->default('normal');

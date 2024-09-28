@@ -17,6 +17,12 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+     public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
     protected $fillable = [
         'fullname',
         'mobile',
@@ -24,16 +30,6 @@ class User extends Authenticatable
         'active',
         'role',
         'password',
-        'gender',
-        'goal',
-        'age',
-        'height',
-        'weight',
-        'targetWeight',
-        'health',
-        'fitnessLevel',
-        'strength',
-        'fatStatus'
     ];
 
 
