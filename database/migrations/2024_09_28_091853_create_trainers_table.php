@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('trainers', function (Blueprint $table) {
             $table->id();
+            $table->string('location');
+            $table->longText('bio');
+            $table->longText('services');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->unique();
             $table->timestamps();
         });
     }

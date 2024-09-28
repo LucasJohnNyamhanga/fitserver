@@ -23,8 +23,9 @@ return new class extends Migration
             $table->string('fitnessLevel');
             $table->string('strength');
             $table->string('fatStatus');
+            $table->string('image')->nullable();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->unique();
             $table->timestamps();
         });
     }

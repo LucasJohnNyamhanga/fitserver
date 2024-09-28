@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Customer extends Model
 {
@@ -13,6 +14,11 @@ class Customer extends Model
     public function user():BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function package():BelongsToMany
+    {
+        return $this->belongsToMany(related: Package::class);
     }
 
     protected $fillable = [
@@ -26,6 +32,7 @@ class Customer extends Model
         'fitnessLevel',
         'strength',
         'fatStatus',
+        'image'
     ];
 
 }

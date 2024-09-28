@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Trainer extends Model
 {
@@ -15,16 +16,14 @@ class Trainer extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function package():HasMany
+    {
+        return $this->hasMany(Package::class);
+    }
+
     protected $fillable = [
-        'gender',
-        'goal',
-        'age',
-        'height',
-        'weight',
-        'targetWeight',
-        'health',
-        'fitnessLevel',
-        'strength',
-        'fatStatus',
+        'location',
+        'bio',
+        'services',
     ];
 }
