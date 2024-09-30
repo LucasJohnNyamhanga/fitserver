@@ -25,5 +25,6 @@ class Trainer extends Model
         'location',
         'bio',
         'services',
+        'active'
     ];
 }

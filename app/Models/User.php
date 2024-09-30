@@ -33,7 +33,7 @@ class User extends Authenticatable
         'mobile',
         'username',
         'active',
-        'role',
+        'is_trainer',
         'password',
     ];
 

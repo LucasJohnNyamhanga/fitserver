@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('mobile');
             $table->string('username')->unique();
             $table->boolean('active')->default(false);
-            $table->string('role')->default('normal');
+            $table->boolean('is_trainer')->default(false);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

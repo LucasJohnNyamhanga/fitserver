@@ -39,6 +39,8 @@ class Package extends Model
         'target',
         'price',
         'active',
-        'rating'
+        'rating',
+        'expectation',
+        'trainer_id',
     ];
 }

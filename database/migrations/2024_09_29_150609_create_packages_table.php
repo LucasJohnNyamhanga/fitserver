@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->longText('description');
+            $table->longText('expectation');
             $table->string('image');
             $table->string('target');
             $table->integer('price');
-            $table->decimal('rating');
+            $table->decimal('rating')->default(0);
             $table->boolean('active')->default(false);
             $table->unsignedBigInteger('trainer_id');
             $table->foreign('trainer_id')->references('id')->on('trainers')->onDelete('cascade');

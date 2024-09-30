@@ -32,7 +32,8 @@ class Customer extends Model
         'fitnessLevel',
         'strength',
         'fatStatus',
-        'image'
+        'image',
+        'user_id',
     ];
 
 }

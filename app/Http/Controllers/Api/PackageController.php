@@ -5,21 +5,21 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PackageRequest;
 use App\Models\Package;
-use Illuminate\Support\Facades\Log;
+use App\Models\Trainer;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class PackageController extends Controller
 {
     public function storePackage(PackageRequest $request)
     {
-
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'image' => 'required|string',
             'description' => 'required|string',
+            'expectation' => 'required|string',
             'type' => 'required|string',
-            'price' => 'required|string',
-            
+            'price' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -28,27 +28,38 @@ class PackageController extends Controller
 
         $title = $request->input('title');
         $description = $request->input('description');
+        $expectation = $request->input('expectation');
         $image = $request->input('image');
         $target = $request->input('type');
         $price = $request->input('price');
 
-        // Check for existing exercise
-        $existingExercise = Package::where('title', $title)->first();
-        if ($existingExercise) {
+        // Check for existing package
+        $existingPackage = Package::where('title', $title)->first();
+        if ($existingPackage) {
             return response()->json(['message' => 'Package already available.'], 409);
         }
 
-        // Create the exercise
-        $exercise = Package::create([
+        // Retrieve the authenticated trainer
+        $trainer = Trainer::where('user_id', Auth::id())->first();
+
+        if (!$trainer) {
+            return response()->json(['message' => 'Trainer not found.'], 404);
+        }
+
+        // Create the new package
+        Package::create([
             'title' => $title,
             'description' => $description,
+            'expectation' => $expectation,
             'image' => $image,
             'target' => $target,
             'price' => $price,
+            'trainer_id' => $trainer->id, // Corrected this part
         ]);
 
         return response()->json(['message' => 'Package has been successfully saved to database.'], 200);
     }
+
 
     public function getPackagesForSelection(PackageRequest $request)
     {
