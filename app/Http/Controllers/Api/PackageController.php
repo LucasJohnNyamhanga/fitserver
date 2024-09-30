@@ -71,7 +71,7 @@ class PackageController extends Controller
     {
         $id = $request->id;
         try {
-            $package = Package::with(['meals', 'exercises'])->where('id', $id)->first();
+            $package = Package::with(['meals', 'exercises','trainer.user'])->where('id', $id)->first();
             if (!$package) {
                 return response()->json(['message' => 'Package not found.'], 404);
             }
