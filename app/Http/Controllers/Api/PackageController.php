@@ -112,4 +112,53 @@ class PackageController extends Controller
         return response()->json(['message' => 'Exercises have been successfully added to the package.'], 200);
     }
 
+    public function changePackageActivation(PackageRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'packageId' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $packageId = $request->input('packageId');
+
+        $package = Package::find($packageId);
+
+        if (!$package) {
+            return response()->json(['message' => 'Package not found.'], 404);
+        }
+
+        $package->active = !$package->active;
+        $package->save();
+
+        return response()->json(['message' => 'Package active status changed.'], 200);
+    }
+
+    public function deletePackageActivation(PackageRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'packageId' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $packageId = $request->input('packageId');
+
+        $package = Package::find($packageId);
+
+        if (!$package) {
+            return response()->json(['message' => 'Package not found.'], 404);
+        }
+
+        $package->delete();
+
+        return response()->json(['message' => 'Package has been deleted.'], 200);
+    }
+
 }

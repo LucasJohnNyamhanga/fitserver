@@ -50,11 +50,15 @@ class BodyTargetController extends Controller
             ->get();
 
             $dietary = Package::where('target', 'Dietary')
-            ->latest()->take(4)
+            ->where('active', true) 
+            ->latest()
+            ->take(4)
             ->get();
 
             $transformation = Package::where('target', 'Transformation')
-            ->latest()->take(4)
+            ->where('active', true) 
+            ->latest()
+            ->take(4)
             ->get();
 
 

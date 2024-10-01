@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('storeMeal', [MealController::class, 'storeMeal']);
     Route::get('getBodyListWithExerciseForPicking', [BodyTargetController::class, 'getBodyListWithExerciseForPicking']);
     Route::post('addExerciseToPackage', [PackageController::class, 'addExerciseToPackage']);
+    Route::post('changePackageActivation', [PackageController::class, 'changePackageActivation']);
+    Route::post('deletePackageActivation', [PackageController::class, 'deletePackageActivation']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
