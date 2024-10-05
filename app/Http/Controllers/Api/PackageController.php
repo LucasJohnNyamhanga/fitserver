@@ -161,4 +161,61 @@ class PackageController extends Controller
         return response()->json(['message' => 'Package has been deleted.'], 200);
     }
 
+    public function editPackage(PackageRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'packageId' => 'required|integer',
+            'title' => 'required|string|max:255',
+            'image' => 'required|string',
+            'description' => 'required|string',
+            'expectation' => 'required|string',
+            'type' => 'required|string',
+            'price' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+        $packageId = $request->input('packageId');
+        $title = $request->input('title');
+        $description = $request->input('description');
+        $expectation = $request->input('expectation');
+        $image = $request->input('image');
+        $target = $request->input('type');
+        $price = $request->input('price');
+
+        // Retrieve the package by its ID
+        $package = Package::find($packageId);
+
+        if (!$package) {
+            return response()->json(['message' => 'Package not found.'], 404);
+        }
+
+        // Check for existing package with the same title (excluding the current package being edited)
+        $existingPackage = Package::where('title', $title)->where('id', '!=', $packageId)->first();
+        if ($existingPackage) {
+            return response()->json(['message' => 'Another package with this title already exists.'], 409);
+        }
+
+        // Retrieve the authenticated trainer
+        $trainer = Trainer::where('user_id', Auth::id())->first();
+
+        if (!$trainer) {
+            return response()->json(['message' => 'Trainer not found.'], 404);
+        }
+
+        // Update the existing package
+        $package->update([
+            'title' => $title,
+            'description' => $description,
+            'expectation' => $expectation,
+            'image' => $image,
+            'target' => $target,
+            'price' => $price,
+            'trainer_id' => $trainer->id, // Corrected this part
+        ]);
+
+        return response()->json(['message' => 'Package has been successfully updated.'], 200);
+    }
 }

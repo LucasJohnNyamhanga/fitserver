@@ -32,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('addExerciseToPackage', [PackageController::class, 'addExerciseToPackage']);
     Route::post('changePackageActivation', [PackageController::class, 'changePackageActivation']);
     Route::post('deletePackageActivation', [PackageController::class, 'deletePackageActivation']);
+    Route::post('editPackage', [PackageController::class, 'editPackage']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
