@@ -80,4 +80,10 @@ class BodyTargetController extends Controller
             'bodyTarget' => $bodyTarget,
         ], 200);
     }
+
+    public function getBodyList(BodyTypeRequest $request)
+    {
+        $bodyTarget = BodyTarget::all();
+        return response()->json(['bodyTarget' => $bodyTarget,], 200);
+    }
 }
