@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -30,6 +31,10 @@ class Exercise extends Model
     {
         return $this->belongsToMany(Package::class);
     }
+    public function trainer():BelongsTo
+    {
+        return $this->belongsTo(Trainer::class);
+    }
 
     protected $fillable = [
         'jina',
@@ -38,6 +43,7 @@ class Exercise extends Model
         'muda',
         'picha',
         'muscleName',
+        'trainer_id',
     ];
 
 }

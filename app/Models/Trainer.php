@@ -21,10 +21,17 @@ class Trainer extends Model
         return $this->hasMany(Package::class);
     }
 
+    public function exercise():HasMany
+    {
+        return $this->hasMany(Exercise::class);
+    }
+
     protected $fillable = [
         'location',
         'bio',
         'services',
-        'active'
+        'active',
+        'is_super',
+        'user_id',
     ];
 }

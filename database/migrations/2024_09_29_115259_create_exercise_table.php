@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('muda');
             $table->string('picha');
             $table->string('muscleName');
+            $table->unsignedBigInteger('trainer_id');
+            $table->foreign('trainer_id')->references('id')->on('trainers')->onDelete('cascade');
             $table->timestamps();
         });
     }

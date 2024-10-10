@@ -8,7 +8,8 @@ use App\Models\BodyTarget;
 use App\Models\Equipment;
 use App\Models\Meal;
 use App\Models\Package;
-use Illuminate\Http\Request;
+use App\Models\Trainer;
+use Illuminate\Support\Facades\Auth;
 
 class BodyTargetController extends Controller
 {
@@ -86,4 +87,30 @@ class BodyTargetController extends Controller
         $bodyTarget = BodyTarget::all();
         return response()->json(['bodyTarget' => $bodyTarget,], 200);
     }
+
+    public function getBodyPartWithExerciseTrainerSpecific(BodyTypeRequest $request)
+    {
+        $bodyPartId = $request->id;
+
+        // Retrieve the authenticated trainer
+        $trainer = Trainer::where('user_id', Auth::id())->first();
+
+        if($trainer){
+            $bodyTarget = BodyTarget::with([
+            'exercises' => function ($query) use ($trainer) {
+                $query->where('trainer_id', $trainer->id)
+                    ->latest();
+                    }])
+                ->where('id', $bodyPartId)
+                ->first();
+            return response()->json([
+                'bodyTarget' => $bodyTarget,
+            ], 200);
+        }
+
+        return response()->json([
+                'message' => 'Your not a trainer',
+            ], 500);
+    }
+
 }

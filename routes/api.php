@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ExcerciseController;
 use App\Http\Controllers\Api\InstructionController;
 use App\Http\Controllers\Api\MealController;
 use App\Http\Controllers\Api\PackageController;
+use App\Http\Controllers\Api\TrainerController;
 use App\Http\Controllers\Api\UploadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('deletePackageActivation', [PackageController::class, 'deletePackageActivation']);
     Route::post('editPackage', [PackageController::class, 'editPackage']);
     Route::get('getBodyList', [BodyTargetController::class, 'getBodyList']);
+    Route::get('getBodyPartWithExerciseTrainerSpecific', [BodyTargetController::class, 'getBodyPartWithExerciseTrainerSpecific']);
+    Route::post('createTrainer', [TrainerController::class, 'createTrainer']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
