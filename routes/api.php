@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BodyTargetController;
+use App\Http\Controllers\Api\UserController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -37,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('getBodyList', [BodyTargetController::class, 'getBodyList']);
     Route::get('getBodyPartWithExerciseTrainerSpecific', [BodyTargetController::class, 'getBodyPartWithExerciseTrainerSpecific']);
     Route::post('createTrainer', [TrainerController::class, 'createTrainer']);
+    Route::get('getUserProfile', [UserController::class, 'getUserProfile']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
