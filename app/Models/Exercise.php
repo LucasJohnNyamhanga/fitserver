@@ -44,6 +44,7 @@ class Exercise extends Model
         'picha',
         'muscleName',
         'trainer_id',
+        'active',
     ];
 
 }

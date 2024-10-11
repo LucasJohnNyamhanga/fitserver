@@ -18,5 +18,6 @@ class BodyTarget extends Model
     protected $fillable = [
         'jina',
         'picha',
+        'active',
     ];
 }

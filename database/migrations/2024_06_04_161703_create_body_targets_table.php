@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('jina');
             $table->string('picha');
+            $table->boolean('active')->default(false);
             $table->timestamps();
         });
     }
