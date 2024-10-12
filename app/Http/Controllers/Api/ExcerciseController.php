@@ -7,6 +7,7 @@ use App\Http\Requests\ExcerciseRequest;
 use App\Models\Exercise;
 use App\Models\Instruction;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class ExcerciseController extends Controller
 {
@@ -52,6 +53,8 @@ class ExcerciseController extends Controller
             'muda' => $time,
             'picha' => $image,
             'muscleName' => $muscleName,
+            'trainer_id'=>Auth::id(),
+            'active'=>false,
         ]);
 
         // Attach body parts and equipment
