@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('instructions', function (Blueprint $table) {
             $table->id();
-            $table->string('maelezo');
+            $table->longText('maelezo');
             $table->unsignedBigInteger('exercise_id');
             $table->foreign('exercise_id')->references('id')->on('exercises')->onDelete('cascade');
             $table->timestamps();

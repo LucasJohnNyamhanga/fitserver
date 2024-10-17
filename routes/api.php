@@ -39,6 +39,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('getBodyPartWithExerciseTrainerSpecific', [BodyTargetController::class, 'getBodyPartWithExerciseTrainerSpecific']);
     Route::post('createTrainer', [TrainerController::class, 'createTrainer']);
     Route::get('getUserProfile', [UserController::class, 'getUserProfile']);
+    Route::post('editBodyTarget', [BodyTargetController::class, 'editBodyTarget']);
+    Route::post('changeBodyActivation', [BodyTargetController::class, 'changeBodyActivation']);
+    Route::post('deleteBodyPart', [BodyTargetController::class, 'deleteBodyPart']);
+    Route::get('getEquipmentWithExercises', [EquipmentController::class, 'getEquipmentWithExercises']);
+    Route::get('getEquipments', [EquipmentController::class, 'getEquipments']);
+    Route::post('editEquipment', [EquipmentController::class, 'editEquipment']);
+    Route::post('deleteEquipment', [EquipmentController::class, 'deleteEquipment']);
 });
 
 Route::post('login', [AuthController::class, 'login']);

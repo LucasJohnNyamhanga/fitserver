@@ -10,6 +10,7 @@ use App\Models\Meal;
 use App\Models\Package;
 use App\Models\Trainer;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class BodyTargetController extends Controller
 {
@@ -48,6 +49,7 @@ class BodyTargetController extends Controller
         $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
                 $query->latest()->take(5);
             }])
+            ->where('active', true)
             ->get();
 
             $dietary = Package::where('target', 'Dietary')
@@ -97,9 +99,10 @@ class BodyTargetController extends Controller
 
         if($trainer){
             $bodyTarget = BodyTarget::with([
-            'exercises' => function ($query) use ($trainer) {
-                $query->where('trainer_id', $trainer->id)
-                    ->latest();
+                'exercises' => function ($query) use ($trainer) {
+                    $query->where('trainer_id', $trainer->id)
+                        ->latest()
+                        ->take(5);
                     }])
                 ->where('id', $bodyPartId)
                 ->first();
@@ -113,4 +116,82 @@ class BodyTargetController extends Controller
             ], 500);
     }
 
+    public function editBodyTarget(BodyTypeRequest $request)
+    {
+        
+
+         $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'image' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+        $name = $request->input('name');
+        $picha = $request->input('image');
+        $id = $request->input('id');
+
+        $body = BodyTarget::find($id);
+
+        if (!$body) {
+            return response()->json(['message' => 'Body part not found.'], 404);
+        }
+
+        $body->jina = $name;
+        $body->picha = $picha;
+        $body->save();
+
+        return response()->json(['message' => 'Body part details changed.'], 200);
+    }
+
+    public function changeBodyActivation(BodyTypeRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $id = $request->input('id');
+
+        $body = BodyTarget::find($id);
+
+        if (!$body) {
+            return response()->json(['message' => 'Body part not found.'], 404);
+        }
+
+        $body->active = !$body->active;
+        $body->save();
+
+        return response()->json(['message' => 'Body part active status changed.'], 200);
+    }
+
+    public function deleteBodyPart(BodyTypeRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $id = $request->input('id');
+
+        $body = BodyTarget::find($id);
+
+        if (!$body) {
+            return response()->json(['message' => 'Body part not found.'], 404);
+        }
+
+        $body->delete();
+
+        return response()->json(['message' => 'Body part has been deleted.'], 200);
+    }
 }
