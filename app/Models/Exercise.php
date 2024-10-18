@@ -12,11 +12,6 @@ class Exercise extends Model
 {
     use HasFactory;
 
-    public function instructions():HasMany
-    {
-        return $this->hasMany(Instruction::class);
-    }
-
     public function equipment(): BelongsToMany
     {
         return $this->belongsToMany(Equipment::class);
@@ -45,6 +40,9 @@ class Exercise extends Model
         'muscleName',
         'trainer_id',
         'active',
+        'video',
+        'repetition',
+        'seti',
+        'instructions',
     ];
-
 }

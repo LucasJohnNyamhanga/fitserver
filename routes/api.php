@@ -20,7 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']); 
     Route::post('storeBodyTarget', [BodyTargetController::class, 'storeBodyTarget']);
     Route::post("upload", [UploadController::class, 'upload']);
-    Route::post('storeInstruction', [InstructionController::class, 'storeInstruction']);
     Route::post('storeExcercise', [ExcerciseController::class, 'storeExcercise']);
     Route::post('storeEquipment', [EquipmentController::class, 'storeEquipment']);
     Route::get('getBodyListAndEquipments', [BodyTargetController::class, 'getBodyListAndEquipments']);
@@ -46,6 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('getEquipments', [EquipmentController::class, 'getEquipments']);
     Route::post('editEquipment', [EquipmentController::class, 'editEquipment']);
     Route::post('deleteEquipment', [EquipmentController::class, 'deleteEquipment']);
+    Route::get('getExercises', [ExcerciseController::class, 'getExercises']);
+    Route::get('getExerciseWithBodyPartAndEquipment', [ExcerciseController::class, 'getExerciseWithBodyPartAndEquipment']);
+    Route::post('editExcercise', [ExcerciseController::class, 'editExcercise']);
 });
 
 Route::post('login', [AuthController::class, 'login']);

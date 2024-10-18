@@ -17,14 +17,19 @@ return new class extends Migration
             $table->longText('maelezo');
             $table->string('ugumu');
             $table->string('muda');
+            $table->string('video')->default('empty');
+            $table->integer('repetition');
+            $table->integer('seti');
             $table->string('picha');
             $table->string('muscleName');
+            $table->longText('instructions');
             $table->boolean('active')->default(false);
             $table->unsignedBigInteger('trainer_id');
             $table->foreign('trainer_id')->references('id')->on('trainers')->onDelete('cascade');
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
