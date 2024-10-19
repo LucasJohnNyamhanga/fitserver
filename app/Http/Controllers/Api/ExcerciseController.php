@@ -181,4 +181,53 @@ class ExcerciseController extends Controller
 
         return response()->json(['message' => 'Exercise has been successfully updated.'], 200);
     }
+
+    public function changeExerciseActivation(ExcerciseRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $id = $request->input('id');
+
+        $exercise = Exercise::find($id);
+
+        if (!$exercise) {
+            return response()->json(['message' => 'Exercise not found.'], 404);
+        }
+
+        $exercise->active = !$exercise->active;
+        $exercise->save();
+
+        return response()->json(['message' => 'Exercise active status changed.'], 200);
+    }
+
+    public function deleteExercise(ExcerciseRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $id = $request->input('id');
+
+        $exercise = Exercise::find($id);
+
+        if (!$exercise) {
+            return response()->json(['message' => 'Exercise not found.'], 404);
+        }
+
+        $exercise->delete();
+
+        return response()->json(['message' => 'Exercise has been deleted.'], 200);
+    }
 }

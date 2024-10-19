@@ -47,7 +47,9 @@ class BodyTargetController extends Controller
     public function getBodyListWithExercise(BodyTypeRequest $request)
     {
         $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
-                $query->latest()->take(5);
+                $query->latest()
+                ->where('active', true)
+                ->take(5);
             }])
             ->where('active', true)
             ->get();

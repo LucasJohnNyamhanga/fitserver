@@ -48,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('getExercises', [ExcerciseController::class, 'getExercises']);
     Route::get('getExerciseWithBodyPartAndEquipment', [ExcerciseController::class, 'getExerciseWithBodyPartAndEquipment']);
     Route::post('editExcercise', [ExcerciseController::class, 'editExcercise']);
+    Route::post('changeExerciseActivation', [ExcerciseController::class, 'changeExerciseActivation']);
+    Route::post('deleteExercise', [ExcerciseController::class, 'deleteExercise']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
