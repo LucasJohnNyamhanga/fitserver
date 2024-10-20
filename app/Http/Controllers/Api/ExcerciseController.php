@@ -169,7 +169,7 @@ class ExcerciseController extends Controller
             'picha' => $image,
             'muscleName' => $muscleName,
             'trainer_id' => Auth::id(),
-            'active' => false,
+            'active' => $exercise->active,
             'seti' => $seti,
             'repetition' => $repitition,
             'video' => $videoLink,
