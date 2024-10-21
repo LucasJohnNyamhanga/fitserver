@@ -135,7 +135,7 @@ class BodyTargetController extends Controller
         $picha = $request->input('image');
         $id = $request->input('id');
 
-        $body = BodyTarget::find($id);
+        $body = BodyTarget::findOrFail($id);
 
         if (!$body) {
             return response()->json(['message' => 'Body part not found.'], 404);

@@ -32,6 +32,11 @@ class Package extends Model
         return $this->belongsToMany(Customer::class);
     }
 
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
     protected $fillable = [
         'title',
         'description',

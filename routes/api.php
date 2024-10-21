@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BodyTargetController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\UserController;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -50,6 +51,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('editExcercise', [ExcerciseController::class, 'editExcercise']);
     Route::post('changeExerciseActivation', [ExcerciseController::class, 'changeExerciseActivation']);
     Route::post('deleteExercise', [ExcerciseController::class, 'deleteExercise']);
+    Route::post('storeToCart', [CartController::class, 'storeToCart']);
+    Route::get('getCart', [CartController::class, 'getCart']);
 });
 
 Route::post('login', [AuthController::class, 'login']);

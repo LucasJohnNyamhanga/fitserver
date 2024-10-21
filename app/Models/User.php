@@ -28,6 +28,11 @@ class User extends Authenticatable
         return $this->hasOne(Trainer::class);
     }
 
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
     protected $fillable = [
         'fullname',
         'mobile',
