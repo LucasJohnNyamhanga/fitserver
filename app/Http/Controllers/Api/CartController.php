@@ -45,4 +45,28 @@ class CartController extends Controller
         ->get();
         return response()->json(['cart' => $cart, ], 200);
     }
+
+    public function deleteCart(CartRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $id = $request->input('id');
+
+        $cart = Cart::find($id);
+
+        if (!$cart) {
+            return response()->json(['message' => 'Package part not found.'], 404);
+        }
+
+        $cart->delete();
+
+        return response()->json(['message' => 'Cart package has been deleted.'], 200);
+    }
 }
