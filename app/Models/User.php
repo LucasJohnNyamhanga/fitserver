@@ -33,6 +33,11 @@ class User extends Authenticatable
         return $this->hasMany(Cart::class);
     }
 
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
+
     protected $fillable = [
         'fullname',
         'mobile',

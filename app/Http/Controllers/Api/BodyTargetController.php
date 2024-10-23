@@ -55,13 +55,19 @@ class BodyTargetController extends Controller
             ->get();
 
             $dietary = Package::where('target', 'Dietary')
-            ->where('active', true) 
+            ->where('active', true)
+            ->whereDoesntHave('purchases', function($query) {
+                $query->where('user_id', Auth::id()); // Exclude packages already purchased by the user
+            })
             ->latest()
             ->take(4)
             ->get();
 
             $transformation = Package::where('target', 'Transformation')
-            ->where('active', true) 
+            ->where('active', true)
+            ->whereDoesntHave('purchases', function($query) {
+                $query->where('user_id', Auth::id()); // Exclude packages already purchased by the user
+            })
             ->latest()
             ->take(4)
             ->get();

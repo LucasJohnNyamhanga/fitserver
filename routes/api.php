@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ExcerciseController;
 use App\Http\Controllers\Api\InstructionController;
 use App\Http\Controllers\Api\MealController;
 use App\Http\Controllers\Api\PackageController;
+use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\TrainerController;
 use App\Http\Controllers\Api\UploadController;
 use Illuminate\Http\Request;
@@ -54,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('storeToCart', [CartController::class, 'storeToCart']);
     Route::get('getCart', [CartController::class, 'getCart']);
     Route::post('deleteCart', [CartController::class, 'deleteCart']);
+    Route::get('getPurchases', [PurchaseController::class, 'getPurchases']);
+    Route::post('makePurchase', [PurchaseController::class, 'makePurchase']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
