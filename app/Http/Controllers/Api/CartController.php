@@ -23,7 +23,9 @@ class CartController extends Controller
         $package_id = $request->input('packageId');
 
         // Check for existing package
-        $existingPackage = Cart::where('package_id', $package_id)->first();
+        $existingPackage = Cart::where('user_id', Auth::id())
+        ->where('package_id', $package_id)
+        ->first();
         if ($existingPackage) {
             return response()->json(['message' => 'Package already exist in cart.'], 409);
         }

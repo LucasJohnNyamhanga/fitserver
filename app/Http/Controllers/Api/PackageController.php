@@ -34,7 +34,8 @@ class PackageController extends Controller
         $price = $request->input('price');
 
         // Check for existing package
-        $existingPackage = Package::where('title', $title)->first();
+        $existingPackage = Package::where('title', $title)
+        ->first();
         if ($existingPackage) {
             return response()->json(['message' => 'Package already available.'], 409);
         }

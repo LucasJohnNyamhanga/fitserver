@@ -32,7 +32,9 @@ class PurchaseController extends Controller
         $package_id = $request->input('packageId');
 
         // Check for existing package
-        $existingPackage = Purchase::where('package_id', $package_id)->first();
+        $existingPackage = Purchase::where('user_id', Auth::id())
+        ->where('package_id', $package_id)
+        ->first();
         if ($existingPackage) {
             return response()->json(['message' => 'Package already exist in purchase list.'], 409);
         }
