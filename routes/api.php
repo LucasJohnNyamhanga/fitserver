@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ActivePackageController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\ExcerciseController;
 use App\Http\Controllers\Api\InstructionController;
@@ -57,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('deleteCart', [CartController::class, 'deleteCart']);
     Route::get('getPurchases', [PurchaseController::class, 'getPurchases']);
     Route::post('makePurchase', [PurchaseController::class, 'makePurchase']);
+    Route::get('getActivePackage', [ActivePackageController::class, 'getActivePackage']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
