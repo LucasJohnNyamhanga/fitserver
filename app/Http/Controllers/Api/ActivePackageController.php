@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ActivePackageRequest;
 use App\Models\ActivePackage;
+use App\Models\Purchase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -13,12 +14,23 @@ class ActivePackageController extends Controller
 {
     public function getActivePackage(ActivePackageRequest $request)
     {
-        $activePackage = ActivePackage::with('package')
-        ->latest()
-        ->where('user_id', Auth::id())
-        ->first();
-        return response()->json(['activePackage' => $activePackage, ], 200);
+        $activePackage = ActivePackage::with('package', 'package.meals',
+    'package.exercises')
+            ->latest()
+            ->where('user_id', Auth::id())
+            ->first();
+
+        $purchases = Purchase::with('package')
+            ->latest()
+            ->where('user_id', Auth::id())
+            ->get();
+
+        return response()->json([
+            'activePackage' => $activePackage,
+            'purchases' => $purchases
+        ], 200);
     }
+
     
     public function activatePackage(ActivePackageRequest $request)
     {

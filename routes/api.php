@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BodyTargetController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\UserController;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -59,6 +60,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('getPurchases', [PurchaseController::class, 'getPurchases']);
     Route::post('makePurchase', [PurchaseController::class, 'makePurchase']);
     Route::get('getActivePackage', [ActivePackageController::class, 'getActivePackage']);
+    Route::post('activatePackage', [ActivePackageController::class, 'activatePackage']);
+    Route::post('storeEvent', [EventController::class, 'storeEvent']);
+    Route::get('getEvents', [EventController::class, 'getEvents']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
