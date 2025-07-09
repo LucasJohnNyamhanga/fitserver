@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\BodyTargetController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ZenoPayController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -63,7 +64,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('activatePackage', [ActivePackageController::class, 'activatePackage']);
     Route::post('storeEvent', [EventController::class, 'storeEvent']);
     Route::get('getEvents', [EventController::class, 'getEvents']);
+    Route::post('deleteEvent', [EventController::class, 'deleteEvent']);
+    Route::post('initiatePayment', [ZenoPayController::class, 'initiatePayment']);
+    Route::get('/payment-status/{reference}', function ($reference) {
+        $payment = \App\Models\Payment::where('reference', $reference)->first();
+    
+        if (!$payment) {
+            return response()->json(['status' => 'not_found'], 404);
+        }
+    
+        return response()->json(['status' => $payment->status]);
+    });
+    
+
 });
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('signup', [AuthController::class, 'signup']);
+Route::post('/zenopay/callback', [ZenoPayController::class, 'paymentCallback'])->name('zenopay.callback');

@@ -54,4 +54,28 @@ class EventController extends Controller
 
         return response()->json(['events' => $events, ], 200);
     }
+    
+    public function deleteEvent(EventRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+
+        $id = $request->input('id');
+
+        $event = Event::find($id);
+
+        if (!$event) {
+            return response()->json(['message' => 'Event not found.'], 404);
+        }
+
+        $event->delete();
+
+        return response()->json(['message' => 'Event has been deleted.'], 200);
+    }
 }
