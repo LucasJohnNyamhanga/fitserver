@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class ZenoPayService
 {
-    protected $baseUrl = 'https://api.zenopay.co.tz/v1';
+    protected $baseUrl = 'https://api.zeno.africa';
 
     public function createPayment($amount, $currency, $reference, $customerMobile, $description = null)
     {
@@ -21,7 +21,7 @@ class ZenoPayService
                 'mobile_number' => $customerMobile,
             ],
             'description' => $description ?? 'ZenoPay Payment',
-            'callback_url' => env('ZENOPAY_CALLBACK_URL', route('zenopay.callback', [], true)),
+            'callback_url' => env('ZENOPAY_CALLBACK_URL'),
         ];
 
         try {

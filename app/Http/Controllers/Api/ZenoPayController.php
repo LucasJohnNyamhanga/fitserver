@@ -6,6 +6,8 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use App\Services\ZenoPayService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
+
 
 class ZenoPayController extends Controller
 {
@@ -69,14 +71,35 @@ class ZenoPayController extends Controller
 
     public function paymentCallback(Request $request)
     {
-        $payment = Payment::where('reference', $request->reference)->first();
-
-        if ($payment) {
-            $payment->status = $request->status;
-            $payment->transaction_id = $request->transaction_id;
-            $payment->method = $request->payment_method;
-            $payment->save();
+        // Optional logging for debugging
+        Log::info('ZenoPay callback received', $request->all());
+    
+        // Validate essential fields
+        $validated = $request->validate([
+            'reference' => 'required|string',
+            'status' => 'required|string',
+            'transaction_id' => 'nullable|string',
+            'payment_method' => 'nullable|string',
+        ]);
+    
+        $payment = Payment::where('reference', $validated['reference'])->first();
+    
+        if (!$payment) {
+            Log::warning('ZenoPay callback: Payment not found for reference ' . $validated['reference']);
+            return response()->json(['status' => 'payment_not_found'], 404);
         }
+    
+        // Avoid overwriting a completed payment
+        if ($payment->status === 'completed') {
+            Log::info('ZenoPay callback: Payment already completed for reference ' . $payment->reference);
+            return response()->json(['status' => 'already_processed']);
+        }
+    
+        // Update payment details
+        $payment->status = $validated['status'];
+        $payment->transaction_id = $validated['transaction_id'];
+        $payment->method = $validated['payment_method'];
+        $payment->save();
     
         return response()->json(['status' => 'callback_received']);
     }
