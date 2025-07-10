@@ -15,8 +15,9 @@ class Payment extends Model
         'reference',
         'status',
         'transaction_id',
-        'method',
+        'channel',
         'amount',
         'package_id',
+        'phone',
     ];
 }

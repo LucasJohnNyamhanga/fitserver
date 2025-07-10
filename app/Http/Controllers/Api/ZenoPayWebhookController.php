@@ -11,6 +11,7 @@ class ZenoPayWebhookController extends Controller
 {
     public function handle(Request $request)
     {
+         Log::info('ZenoPayWebhookController being used:', ['Message' => 'Call successful']);
         // ✅ Authenticate webhook
         $apiKey = env('ZENOPAY_API_KEY');
         if ($request->header('x-api-key') !== $apiKey) {
@@ -26,11 +27,13 @@ class ZenoPayWebhookController extends Controller
         $orderId = $data['order_id'] ?? null;
         $status = $data['payment_status'] ?? null;
         $transactionId = $data['reference'] ?? null;
+        $channel = $data['channel'] ?? null;
 
         if ($orderId && $status === 'COMPLETED') {
             $updated = DB::table('payments')->where('reference', $orderId)->update([
                 'status' => 'completed',
                 'transaction_id' => $transactionId,
+                'channel' => $channel,
                 'updated_at' => now(),
             ]);
 
