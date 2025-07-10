@@ -3,43 +3,53 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class ZenoPayService
 {
-    protected $baseUrl = 'https://api.zeno.africa';
+    protected string $baseUrl = 'https://zenoapi.com/api';
 
-    public function createPayment($amount, $currency, $reference, $customerMobile, $description = null)
-    {
-        $token = env('ZENOPAY_API_TOKEN');
+    /**
+     * Create a mobile money payment request using ZenoPay.
+     */
+    public function createPayment(
+        string $orderId,
+        string $buyerEmail,
+        string $buyerName,
+        string $buyerPhone,
+        float|int $amount,
+        ?string $webhookUrl = null //Implicitly nullable parameters are deprecated.
+    ): array {
+        $apiKey = env('ZENOPAY_API_KEY');
 
         $payload = [
+            'order_id' => $orderId,
+            'buyer_email' => $buyerEmail,
+            'buyer_name' => $buyerName,
+            'buyer_phone' => $buyerPhone,
             'amount' => $amount,
-            'currency' => $currency,
-            'reference' => $reference,
-            'customer' => [
-                'mobile_number' => $customerMobile,
-            ],
-            'description' => $description ?? 'ZenoPay Payment',
-            'callback_url' => env('ZENOPAY_CALLBACK_URL'),
         ];
 
-        try {
-            $response = Http::withToken($token)
-                ->timeout(10)
-                ->post("{$this->baseUrl}/invoices", $payload);
+        if ($webhookUrl) {
+            $payload['webhook_url'] = $webhookUrl;
+        }
 
-            Log::info('ZenoPay Request Sent', $payload);
-            Log::info('ZenoPay Response', $response->json());
+        try {
+            $response = Http::withHeaders([
+                'x-api-key' => $apiKey,
+                'Accept' => 'application/json',
+            ])
+            ->timeout(30) // Timeout in seconds
+            ->retry(3, 1000) // Retry 3 times with 1s delay
+            ->post("{$this->baseUrl}/payments/mobile_money_tanzania", $payload);
 
             if ($response->failed()) {
                 throw new \Exception('ZenoPay API Error: ' . $response->body());
             }
 
             return $response->json();
+
         } catch (\Exception $e) {
-            Log::error('ZenoPay HTTP Error: ' . $e->getMessage());
-            throw new \Exception("Payment request failed. Try again later.");
+            throw new \Exception("ZenoPay request failed: " . $e->getMessage(), 0, $e);
         }
     }
 }

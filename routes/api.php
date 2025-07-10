@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ZenoPayController;
+use App\Http\Controllers\Api\ZenoPayWebhookController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -81,4 +82,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('signup', [AuthController::class, 'signup']);
-Route::post('/zenopay/callback', [ZenoPayController::class, 'paymentCallback'])->name('zenopay.callback');
+Route::post('/zenopay/webhook', [ZenoPayWebhookController::class, 'handle'])->name('zenopay.webhook');
