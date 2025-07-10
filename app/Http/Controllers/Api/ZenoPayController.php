@@ -62,6 +62,7 @@ class ZenoPayController extends Controller
             // Log API response for reference
             Log::info('ZenoPay initiated successfully', [
                 'reference' => $validated['reference'],
+                'mobile' => $validated['mobile'],
                 'api_response' => $response
             ]);
 

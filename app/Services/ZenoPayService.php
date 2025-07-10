@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ZenoPayService
 {
@@ -17,9 +18,10 @@ class ZenoPayService
         string $buyerName,
         string $buyerPhone,
         float|int $amount,
-        ?string $webhookUrl = null //Implicitly nullable parameters are deprecated.
+        ?string $webhookUrl = null // ✅ Explicit nullable
     ): array {
         $apiKey = env('ZENOPAY_API_KEY');
+        $webhookUrl = $webhookUrl ?? env('ZENOPAY_CALLBACK_URL'); // ✅ Use passed param or fallback to .env
 
         $payload = [
             'order_id' => $orderId,
@@ -32,15 +34,17 @@ class ZenoPayService
         if ($webhookUrl) {
             $payload['webhook_url'] = $webhookUrl;
         }
+        
+        Log::info('Webhook URL being used:', ['url' => $webhookUrl]);
 
         try {
             $response = Http::withHeaders([
                 'x-api-key' => $apiKey,
                 'Accept' => 'application/json',
             ])
-            ->timeout(30) // Timeout in seconds
-            ->retry(3, 1000) // Retry 3 times with 1s delay
-            ->post("{$this->baseUrl}/payments/mobile_money_tanzania", $payload);
+                ->timeout(30)
+                ->retry(3, 1000)
+                ->post("{$this->baseUrl}/payments/mobile_money_tanzania", $payload);
 
             if ($response->failed()) {
                 throw new \Exception('ZenoPay API Error: ' . $response->body());
