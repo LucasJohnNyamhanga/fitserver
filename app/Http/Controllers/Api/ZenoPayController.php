@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\ZenoPayService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ZenoPayController extends Controller
 {
@@ -59,12 +59,16 @@ class ZenoPayController extends Controller
                 webhookUrl: $webhookUrl
             );
 
+            $user = Auth::user();
+
             // Log API response for reference
             Log::info('ZenoPay initiated successfully', [
                 'reference' => $validated['reference'],
                 'mobile' => $validated['mobile'],
                 'api_response' => $response
             ]);
+            
+            $channel = $this->getMtandaoFromNumber($validated['mobile']);
 
             // Save to local DB
             Payment::create([
@@ -73,7 +77,8 @@ class ZenoPayController extends Controller
                 'status' => 'pending',
                 'package_id' => $validated['packageId'],
                 'phone' => $validated['mobile'],
-                'channel' => 'ZENOPAY',
+                'user_id' => $user->id,
+                'channel' => $channel,
             ]);
 
             return response()->json([
@@ -94,4 +99,22 @@ class ZenoPayController extends Controller
             ], 500);
         }
     }
+    
+    function getMtandaoFromNumber(string $number): string
+    {
+        // Normalize number (remove +255 or leading 255)
+        $number = preg_replace('/^\+?255/', '0', $number);
+    
+        $prefix = substr($number, 0, 4);
+    
+        return match ($prefix) {
+            '0754', '0755', '0756', '0757', '0758' => 'mpesa',
+            '0783', '0784', '0785', '0786', '0787', '0788', '0789' => 'airtelmoney',
+            '0655', '0656', '0657', '0658', '0659' => 'tigopesa',
+            '0683', '0684', '0685', '0686', '0687' => 'halopesa',
+            '0673', '0674', '0675', '0676', '0677' => 'ttcl',
+            default => 'unknown',
+        };
+    }
+
 }

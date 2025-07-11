@@ -35,7 +35,6 @@ class ZenoPayService
             $payload['webhook_url'] = $webhookUrl;
         }
         
-        Log::info('Webhook URL being used:', ['url' => $webhookUrl]);
 
         try {
             $response = Http::withHeaders([
@@ -56,4 +55,24 @@ class ZenoPayService
             throw new \Exception("ZenoPay request failed: " . $e->getMessage(), 0, $e);
         }
     }
+
+    public function checkStatus(string $reference): object
+    {
+        $response = Http::withToken(config('services.zenopay.token'))
+            ->get("https://zenoapi.com/api/payments/$reference/status");
+
+        if ($response->successful() && isset($response['data']['status'])) {
+            return (object)[
+                'status' => $response['data']['status'],
+                'details' => $response['data'] ?? null,
+            ];
+        }
+
+        // Fallback if response is invalid or missing data
+        return (object)[
+            'status' => 'pending',
+            'details' => null,
+        ];
+    }
+
 }

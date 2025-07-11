@@ -38,6 +38,12 @@ class User extends Authenticatable
         return $this->hasMany(Purchase::class);
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+
     protected $fillable = [
         'fullname',
         'mobile',

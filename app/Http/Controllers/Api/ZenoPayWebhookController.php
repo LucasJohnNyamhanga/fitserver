@@ -11,7 +11,6 @@ class ZenoPayWebhookController extends Controller
 {
     public function handle(Request $request)
     {
-         Log::info('ZenoPayWebhookController being used:', ['Message' => 'Call successful']);
         // ✅ Authenticate webhook
         $apiKey = env('ZENOPAY_API_KEY');
         if ($request->header('x-api-key') !== $apiKey) {
