@@ -20,8 +20,8 @@ class ZenoPayService
         float|int $amount,
         ?string $webhookUrl = null // ✅ Explicit nullable
     ): array {
-        $apiKey = env('ZENOPAY_API_KEY');
-        $webhookUrl = $webhookUrl ?? env('ZENOPAY_CALLBACK_URL'); // ✅ Use passed param or fallback to .env
+        $apiKey = config('services.zenopay.token');
+        $webhookUrl = $webhookUrl ?? $apiKey; // ✅ Use passed param or fallback to .env
 
         $payload = [
             'order_id' => $orderId,
@@ -58,19 +58,55 @@ class ZenoPayService
 
     public function checkStatus(string $reference): object
     {
-        $response = Http::withToken(config('services.zenopay.token'))
-            ->get("https://zenoapi.com/api/payments/$reference/status");
-
-        if ($response->successful() && isset($response['data']['status'])) {
-            return (object)[
-                'status' => $response['data']['status'],
-                'details' => $response['data'] ?? null,
-            ];
+        $apiKey = config('services.zenopay.token');
+    
+        try {
+            $response = Http::withHeaders([
+                    'x-api-key' => $apiKey,
+                    'Accept'    => 'application/json',
+                ])
+                ->timeout(10)
+                ->get("{$this->baseUrl}/payments/order-status?order_id={$reference}");
+    
+            Log::info("ZenoPay status response for {$reference}: {$response->body()}");
+    
+            if ($response->successful()) {
+                $responseData = $response->json();
+    
+                if (!empty($responseData['data']) && is_array($responseData['data'])) {
+                    $paymentInfo = $responseData['data'][0]; // first item in data array
+    
+                    if (isset($paymentInfo['payment_status'])) {
+                        // Update database here
+                        $payment = \App\Models\Payment::where('reference', $reference)->first();
+    
+                        if ($payment) {
+                            $payment->status = strtolower($paymentInfo['payment_status']);
+                            $payment->transaction_id = $paymentInfo['transid'] ?? null;
+                            $payment->channel = $paymentInfo['channel'] ?? $payment->channel;
+                            $payment->amount = $paymentInfo['amount'] ?? $payment->amount;
+                            $payment->save();
+                        } else {
+                            Log::warning("Payment with reference {$reference} not found in database.");
+                        }
+    
+                        return (object)[
+                            'status'  => strtolower($paymentInfo['payment_status']),
+                            'details' => $paymentInfo,
+                        ];
+                    }
+                }
+            }
+    
+            Log::warning("ZenoPay returned unexpected response format for {$reference}");
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            Log::error("ZenoPay request exception for {$reference}: {$e->getMessage()}");
+        } catch (\Throwable $e) {
+            Log::error("ZenoPay unknown error for {$reference}: {$e->getMessage()}");
         }
-
-        // Fallback if response is invalid or missing data
+    
         return (object)[
-            'status' => 'pending',
+            'status'  => 'PENDING',
             'details' => null,
         ];
     }
