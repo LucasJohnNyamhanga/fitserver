@@ -100,20 +100,30 @@ class ZenoPayController extends Controller
         }
     }
     
-    function getMtandaoFromNumber(string $number): string
+   function getMtandaoFromNumber(string $number): string
     {
-        // Normalize number (remove +255 or leading 255)
-        $number = preg_replace('/^\+?255/', '0', $number);
-    
-        $prefix = substr($number, 0, 4);
-    
+        // Normalize: remove non-numeric characters
+        $number = preg_replace('/\D+/', '', $number);
+
+        // Standardize number to start with 0 (replace +255 or 255 with 0)
+        if (str_starts_with($number, '255')) {
+            $number = '0' . substr($number, 3);
+        }
+
+        // Ensure number is at least 4 digits
+        if (strlen($number) < 4) {
+            return 'Mtandao';
+        }
+
+        $prefix = substr($number, 0, 3); // Tanzanian prefixes are 3 digits after 0
+
         return match ($prefix) {
-            '0754', '0755', '0756', '0757', '0758' => 'Mpesa',
-            '0783', '0784', '0785', '0786', '0787', '0788', '0789' => 'AirtelMoney',
-            '0655', '0656', '0657', '0658', '0659' => 'TigoPesa',
-            '0683', '0684', '0685', '0686', '0687' => 'HaloPesa',
-            '0673', '0674', '0675', '0676', '0677' => 'Ttcl',
-            default => 'Mtandao',
+            '075', '076', '074' => 'Mpesa',      // Vodacom
+            '078', '068', '069', '079' => 'AirtelMoney', // Airtel
+            '071', '077', '065' =>  'TigoPesa',      // Tigo
+            '062', '061' => 'HaloPesa',                // Halotel
+            '073' => 'TTCLPesa',                    // TTCL
+            default => 'Mtandao',                   // Unknown/Other
         };
     }
 

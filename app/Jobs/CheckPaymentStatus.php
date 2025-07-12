@@ -32,7 +32,7 @@ class CheckPaymentStatus implements ShouldQueue
         try {
             $response = $zenoPay->checkStatus($this->payment->reference);
 
-            if ($response->status === 'COMPLETED') {
+            if (isset($response['status']) && strtoupper($response['status']) === 'COMPLETED') {
                 $this->payment->update(['status' => 'completed']);
                 Log::info("Payment {$this->payment->id} completed.");
                 return; // done
@@ -64,7 +64,7 @@ class CheckPaymentStatus implements ShouldQueue
 
         } catch (\Throwable $e) {
             Log::error("Payment check failed for payment {$this->payment->id}: {$e->getMessage()}");
-            // Optionally, re-dispatch with some delay or handle differently
+            // Optionally, you could re-dispatch with a delay here if needed
         }
     }
 }
