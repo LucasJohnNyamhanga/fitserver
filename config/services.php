@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'zenopay' => [
+        'token' => env('ZENOPAY_API_KEY'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

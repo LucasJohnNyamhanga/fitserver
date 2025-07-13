@@ -76,8 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
     
         return response()->json(['status' => $payment->status]);
     });
-    
-
 });
 
 Route::post('login', [AuthController::class, 'login']);
