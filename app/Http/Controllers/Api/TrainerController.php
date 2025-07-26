@@ -56,9 +56,18 @@ class TrainerController extends Controller
                 'message' => $ex->getMessage()
             ], 500);
         }
-
-        
-
-        
     }
+
+    public function getUsersWhoAreTrainers(TrainerRequest $request)
+    {
+        $users = User::with(['trainer', 'customer'])
+            ->whereHas('trainer')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'trainers' => $users,
+        ], 200);
+    }
+
 }
