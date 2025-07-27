@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('storeEvent', [EventController::class, 'storeEvent']);
     Route::get('getEvents', [EventController::class, 'getEvents']);
     Route::post('deleteEvent', [EventController::class, 'deleteEvent']);
+    Route::get('getUsersWhoAreTrainers', [TrainerController::class, 'getUsersWhoAreTrainers']);
     Route::post('initiatePayment', [ZenoPayController::class, 'initiatePayment']);
     Route::get('/payment-status/{reference}', function ($reference) {
         $payment = \App\Models\Payment::where('reference', $reference)->first();
