@@ -8,6 +8,8 @@ use App\Models\Trainer;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TrainerController extends Controller
 {
@@ -70,4 +72,72 @@ class TrainerController extends Controller
         ], 200);
     }
 
+
+    public function toggleActiveStatus(TrainerRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'trainerId' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Trainer ID not provided',
+                'errors' => $validator->errors()->first()
+            ], 400);
+        }
+
+        try {
+            $trainer = Trainer::findOrFail($request->input('trainerId'));
+            $trainer->active = !$trainer->active;
+            $trainer->save();
+
+            return response()->json([
+                'message' => $trainer->active ? 'Trainer activated successfully.' : 'Trainer deactivated successfully.',
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Trainer not found.',
+                'error' => $e->getMessage()
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while toggling trainer status.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function toggleSuperStatus(TrainerRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'trainerId' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Trainer ID not provided',
+                'errors' => $validator->errors()->first()
+            ], 400);
+        }
+
+        try {
+            $trainer = Trainer::findOrFail($request->input('trainerId'));
+            $trainer->is_super = !$trainer->is_super;
+            $trainer->save();
+
+            return response()->json([
+                'message' => $trainer->is_super ? 'Super Trainer activated successfully.' : 'Super Trainer deactivated successfully.',
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Trainer not found.',
+                'error' => $e->getMessage()
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while toggling trainer status.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

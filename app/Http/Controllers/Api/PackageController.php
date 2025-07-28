@@ -64,25 +64,33 @@ class PackageController extends Controller
 
     public function getPackagesForSelection(PackageRequest $request)
     {
-        $package = Package::latest()->get();
-        return response()->json(['packages' => $package, ], 200);
-    }
-
-    public function getPackageWithDetails(PackageRequest $request)
-    {
-        $id = $request->id;
         try {
-            $package = Package::with(['meals', 'exercises','trainer.user'])->where('id', $id)->first();
-            if (!$package) {
-                return response()->json(['message' => 'Package not found.'], 404);
+            // Get the trainer associated with the logged-in user
+            $trainer = Trainer::where('user_id', Auth::id())->first();
+
+            if (!$trainer) {
+                return response()->json([
+                    'message' => 'Trainer profile not found for the logged-in user.'
+                ], 404);
             }
 
-            return response()->json(['package' => $package], 200);
-        } catch (\Exception $e) {
+            // Get all packages created by this trainer
+            $packages = $trainer->package()
+                ->latest()
+                ->get();
 
-            return response()->json(['message' => 'An error occurred while fetching the package. '. $e->getMessage()], 500);
+            return response()->json([
+                'packages' => $packages
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' =>$e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
+
 
     public function addExerciseToPackage(PackageRequest $request)
     {
