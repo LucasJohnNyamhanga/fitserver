@@ -48,22 +48,22 @@ class BodyTargetController extends Controller
     {
         $userId = Auth::id();
 
-        // Load body targets with up to 5 active exercises each
+        // Load only active BodyTargets that have at least one exercise from a super trainer
         $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
-            $query->where('active', true)
-                ->latest()
-                ->take(30);
-        }])
-        ->where('active', true)
-        ->get();
+                $query->where('active', true)
+                    ->latest()
+                    ->take(30);
+            }])
+            ->where('active', true)
+            ->whereHas('exercises.trainer', function ($query) {
+                $query->where('is_super', true); // Only from super trainers
+            })
+            ->get();
 
-        // Helper query for reusable constraints
+        // Helper query to fetch packages by target
         $basePackageQuery = function ($target) use ($userId) {
             return Package::where('target', $target)
                 ->where('active', true)
-                ->whereHas('trainer', function ($query) {
-                    $query->where('is_super', true); // Only from super trainers
-                })
                 ->whereDoesntHave('purchases', function ($query) use ($userId) {
                     $query->where('user_id', $userId); // Not already purchased
                 })
@@ -81,7 +81,6 @@ class BodyTargetController extends Controller
             'transformation' => $transformation,
         ], 200);
     }
-
 
 
     public function getBodyListWithExerciseForPicking(BodyTypeRequest $request)

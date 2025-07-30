@@ -27,7 +27,7 @@ class ZenoPayWebhookController extends Controller
             return response()->json(['message' => 'Ignored or invalid status'], 200);
         }
 
-        // We're using order_id as reference in DB
+        // Using order_id as reference in DB
         $payment = Payment::where('reference', $orderId)->first();
 
         if (!$payment) {
@@ -36,7 +36,7 @@ class ZenoPayWebhookController extends Controller
         }
 
         // Avoid double-processing
-        if (strtoupper($payment->status) === 'COMPLETED') {
+        if ($payment->status === 'completed') {
             return response()->json(['message' => 'Already completed'], 200);
         }
 
@@ -44,23 +44,23 @@ class ZenoPayWebhookController extends Controller
         $response = $this->zenoPay->checkStatus($orderId);
         $transaction = $response['details'] ?? null;
 
-        if (!$transaction || strtoupper($transaction['payment_status'] ?? '') !== 'COMPLETED') {
+        if (!$transaction || strtolower($transaction['payment_status'] ?? '') !== 'completed') {
             return response()->json(['message' => 'Status not confirmed'], 200);
         }
 
-        // Use previous values if missing in API
+        // Use previous values if missing in API response
         $channel = $payment->channel;
         $reference = $payment->reference;
 
         $payment->update([
-            'status' => 'COMPLETED',
+            'status' => 'completed',
             'transaction_id' => $transaction['transid'] ?? null,
             'channel' => $transaction['channel'] ?? $channel,
             'reference' => $transaction['reference'] ?? $reference,
             'completed_at' => now(),
         ]);
 
-        Log::info("Payment $orderId marked as COMPLETED via webhook.");
+        Log::info("Payment $orderId marked as completed via webhook.");
 
         return response()->json(['message' => 'Payment updated'], 200);
     }

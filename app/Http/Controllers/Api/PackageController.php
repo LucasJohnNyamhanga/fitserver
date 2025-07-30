@@ -23,43 +23,55 @@ class PackageController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+            return response()->json([
+                'message' => 'Fill in all empty fields', 
+                'errors' => $validator->errors()
+            ], 400);
         }
 
-        $title = $request->input('title');
-        $description = $request->input('description');
-        $expectation = $request->input('expectation');
-        $image = $request->input('image');
-        $target = $request->input('type');
-        $price = $request->input('price');
+        try {
+            $title = $request->input('title');
+            $description = $request->input('description');
+            $expectation = $request->input('expectation');
+            $image = $request->input('image');
+            $target = $request->input('type');
+            $price = $request->input('price');
 
-        // Check for existing package
-        $existingPackage = Package::where('title', $title)
-        ->first();
-        if ($existingPackage) {
-            return response()->json(['message' => 'Package already available.'], 409);
+            // Check for existing package
+            $existingPackage = Package::where('title', $title)->first();
+            if ($existingPackage) {
+                return response()->json(['message' => 'Package already available.'], 409);
+            }
+
+            // Retrieve the authenticated trainer
+            $trainer = Trainer::where('user_id', Auth::id())->first();
+            if (!$trainer) {
+                return response()->json(['message' => 'Trainer not found.'], 404);
+            }
+
+            // Create the new package
+            Package::create([
+                'title' => $title,
+                'description' => $description,
+                'expectation' => $expectation,
+                'image' => $image,
+                'target' => $target,
+                'price' => $price,
+                'trainer_id' => $trainer->id,
+            ]);
+
+            return response()->json([
+                'message' => 'Package has been successfully saved to database.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Retrieve the authenticated trainer
-        $trainer = Trainer::where('user_id', Auth::id())->first();
-
-        if (!$trainer) {
-            return response()->json(['message' => 'Trainer not found.'], 404);
-        }
-
-        // Create the new package
-        Package::create([
-            'title' => $title,
-            'description' => $description,
-            'expectation' => $expectation,
-            'image' => $image,
-            'target' => $target,
-            'price' => $price,
-            'trainer_id' => $trainer->id, // Corrected this part
-        ]);
-
-        return response()->json(['message' => 'Package has been successfully saved to database.'], 200);
     }
+
 
 
     public function getPackagesForSelection(PackageRequest $request)

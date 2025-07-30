@@ -6,6 +6,7 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use App\Services\ZenoPayService;
 use App\Http\Controllers\Controller;
+use App\Models\Purchase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -31,7 +32,7 @@ class ZenoPayController extends Controller
             'amount' => 'required|numeric|min:100',
             'mobile' => 'required|string|min:10|max:15',
             'reference' => 'required|string|max:50|unique:payments,reference',
-            'kifurushi_id' => 'required|exists:kifurushis,id',
+            'packageId' => 'required|exists:packages,id',
             'buyerEmail' => 'nullable|email',
             'buyerName' => 'nullable|string|max:100',
         ]);
@@ -48,6 +49,16 @@ class ZenoPayController extends Controller
         $buyerEmail = $request->buyerEmail ?? 'datasofttanzania@gmail.com';
         $buyerName = $request->buyerName ?? 'Anonymous User';
         $webhookUrl = env('ZENOPAY_CALLBACK_URL'); // Ensure this route is secured!
+
+        $existingPurchase = Purchase::where('user_id', Auth::id())
+            ->where('package_id', $request->packageId)
+            ->first();
+
+        if ($existingPurchase) {
+            return response()->json([
+                'message' => 'Package already exists in purchase list.'
+            ], 409);
+        }
 
         try {
             // Call ZenoPay API
@@ -67,7 +78,7 @@ class ZenoPayController extends Controller
                 'reference'     => $request->reference,
                 'amount'        => $request->amount,
                 'status'        => 'pending',
-                'kifurushi_id'  => $request->kifurushi_id,
+                'package_id'  => $request->packageId,
                 'phone'         => $request->mobile,
                 'user_id'       => $user->id,
                 'channel'       => $channel,
@@ -82,7 +93,7 @@ class ZenoPayController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Payment initiated successfully.',
+                'message' => 'Wait for pop up to confirm payment.',
                 'data' => [
                     'zenopay' => $response,
                     'reference' => $payment->reference,
@@ -90,7 +101,7 @@ class ZenoPayController extends Controller
                 ],
             ]);
         } catch (\Throwable $e) {
-            Log::error('ZenoPay initiation failed', [
+            Log::error('Payment initiation failed', [
                 'reference' => $request->reference ?? null,
                 'error' => $e->getMessage(),
             ]);
