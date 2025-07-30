@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ExcerciseRequest;
 use App\Models\Exercise;
 use App\Models\Instruction;
+use App\Models\Trainer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,12 +27,14 @@ class ExcerciseController extends Controller
         'seti' => 'required|integer',
         'repitition' => 'required|integer',
         'videoLink' => 'string',
-    ]);
+        ]);
 
 
-    if ($validator->fails()) {
-        return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
-    }
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+        }
+
+        $trainer = Trainer::where('user_id', Auth::id())->first();
 
         $name = $request->input('name');
         $details = $request->input('details');
@@ -61,7 +64,7 @@ class ExcerciseController extends Controller
             'instructions' => $instructions,
             'picha' => $image,
             'muscleName' => $muscleName,
-            'trainer_id'=>Auth::id(),
+            'trainer_id'=>$trainer->id,
             'active'=>false,
             'seti' => $seti,
             'repetition' => $repitition,

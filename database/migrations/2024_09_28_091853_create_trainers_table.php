@@ -18,10 +18,17 @@ return new class extends Migration
             $table->longText('services');
             $table->boolean('active')->default(false);
             $table->boolean('is_super')->default(false);
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->unique();
+            
+            $table->unsignedBigInteger('user_id')->unique(); // define unique first
+        
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade'); // define foreign key separately
+        
             $table->timestamps();
         });
+        
     }
 
     /**

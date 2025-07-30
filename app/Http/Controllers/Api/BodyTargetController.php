@@ -46,51 +46,61 @@ class BodyTargetController extends Controller
 
     public function getBodyListWithExercise(BodyTypeRequest $request)
     {
+        $userId = Auth::id();
+
+        // Load body targets with up to 5 active exercises each
         $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
-                $query->latest()
+            $query->where('active', true)
+                ->latest()
+                ->take(30);
+        }])
+        ->where('active', true)
+        ->get();
+
+        // Helper query for reusable constraints
+        $basePackageQuery = function ($target) use ($userId) {
+            return Package::where('target', $target)
                 ->where('active', true)
-                ->take(5);
-            }])
-            ->where('active', true)
-            ->get();
+                ->whereHas('trainer', function ($query) {
+                    $query->where('is_super', true); // Only from super trainers
+                })
+                ->whereDoesntHave('purchases', function ($query) use ($userId) {
+                    $query->where('user_id', $userId); // Not already purchased
+                })
+                ->latest()
+                ->take(30)
+                ->get();
+        };
 
-            $dietary = Package::where('target', 'Dietary')
-            ->where('active', true)
-            ->whereDoesntHave('purchases', function($query) {
-                $query->where('user_id', Auth::id()); // Exclude packages already purchased by the user
-            })
-            ->latest()
-            ->take(4)
-            ->get();
-
-            $transformation = Package::where('target', 'Transformation')
-            ->where('active', true)
-            ->whereDoesntHave('purchases', function($query) {
-                $query->where('user_id', Auth::id()); // Exclude packages already purchased by the user
-            })
-            ->latest()
-            ->take(4)
-            ->get();
-
+        $dietary = $basePackageQuery('Dietary');
+        $transformation = $basePackageQuery('Transformation');
 
         return response()->json([
             'bodyTarget' => $bodyTarget,
-            'dietary'=> $dietary,
-            'transformation'=> $transformation,
+            'dietary' => $dietary,
+            'transformation' => $transformation,
         ], 200);
     }
+
 
 
     public function getBodyListWithExerciseForPicking(BodyTypeRequest $request)
     {
-        $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
-                $query->latest();
-            }])
-            ->get();
+        $trainer = Trainer::where('user_id', Auth::id())->first();
+
+        if (!$trainer) {
+            return response()->json(['message' => 'Trainer not found'], 404);
+        }
+
+        $bodyTarget = BodyTarget::with(['exercises' => function ($query) use ($trainer) {
+            $query->where('trainer_id', $trainer->id)->latest();
+        }])->get();
+
         return response()->json([
             'bodyTarget' => $bodyTarget,
         ], 200);
     }
+
 
     public function getBodyList(BodyTypeRequest $request)
     {

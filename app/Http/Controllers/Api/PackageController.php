@@ -91,6 +91,22 @@ class PackageController extends Controller
         }
     }
 
+    public function getPackageWithDetails(PackageRequest $request)
+    {
+        $id = $request->id;
+        try {
+            $package = Package::with(['meals', 'exercises','trainer.user'])->where('id', $id)->first();
+            if (!$package) {
+                return response()->json(['message' => 'Package not found.'], 404);
+            }
+
+            return response()->json(['package' => $package], 200);
+        } catch (\Exception $e) {
+
+            return response()->json(['message' => 'An error occurred while fetching the package. '. $e->getMessage()], 500);
+        }
+    }
+
 
     public function addExerciseToPackage(PackageRequest $request)
     {
