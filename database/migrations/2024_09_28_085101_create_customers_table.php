@@ -6,33 +6,69 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('customers', function (Blueprint $table) {
+
             $table->id();
-            $table->string('gender');
-            $table->string('goal');
+
+            /*
+            |----------------------------------
+            | Profile Attributes
+            |----------------------------------
+            */
+
+            $table->string('gender', 20);
+            $table->string('goal', 100);
+
             $table->integer('age');
             $table->integer('height');
             $table->integer('weight');
             $table->integer('targetWeight');
-            $table->string('health');
-            $table->string('fitnessLevel');
-            $table->string('strength');
-            $table->string('fatStatus');
+
+            $table->string('health', 100)->nullable();
+            $table->string('fitnessLevel', 100)->nullable();
+            $table->string('strength', 100)->nullable();
+            $table->string('fatStatus', 100)->nullable();
+
+            /*
+            |----------------------------------
+            | Media
+            |----------------------------------
+            */
             $table->string('image')->nullable();
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->unique();
-            $table->timestamps();
+
+            /*
+            |----------------------------------
+            | Relations (One-to-One with users)
+            |----------------------------------
+            */
+            $table->foreignId('user_id')
+                ->unique()
+                ->constrained()
+                ->cascadeOnDelete();
+
+            /*
+            |----------------------------------
+            | Index Strategy (Clean & Efficient)
+            |----------------------------------
+            */
+
+            // Composite index for filtering by gender + goal
+            $table->index(['gender', 'goal'], 'customers_gender_goal_idx');
+
+            // Age index only once
+            $table->index('age', 'customers_age_idx');
+
+            /*
+            |----------------------------------
+            | PostgreSQL Safe Timestamps
+            |----------------------------------
+            */
+            $table->timestampsTz();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('customers');

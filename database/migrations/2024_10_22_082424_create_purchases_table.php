@@ -6,24 +6,59 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('purchases', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('package_id');
-            $table->foreign('package_id')->references('id')->on('packages')->onDelete('cascade');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->timestamps();
+
+            /*
+            |----------------------------------
+            | Primary Key
+            |----------------------------------
+            */
+            $table->bigIncrements('id');
+
+            /*
+            |----------------------------------
+            | Relations
+            |----------------------------------
+            */
+
+            $table->unsignedBigInteger('package_id')->index();
+            $table->unsignedBigInteger('user_id')->index();
+
+            /*
+            |----------------------------------
+            | Foreign Keys
+            |----------------------------------
+            */
+
+            $table->foreign('package_id')
+                ->references('id')
+                ->on('packages')
+                ->onDelete('cascade');
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+
+            /*
+            |----------------------------------
+            | Prevent Duplicate Purchase Records
+            |----------------------------------
+            */
+            $table->unique(['package_id', 'user_id']);
+
+            /*
+            |----------------------------------
+            | Timestamp (PostgreSQL Safe)
+            |----------------------------------
+            */
+            $table->timestampTz('created_at')->useCurrent();
+            $table->timestampTz('updated_at')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('purchases');

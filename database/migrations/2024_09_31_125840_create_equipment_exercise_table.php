@@ -6,25 +6,47 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('equipment_exercise', function (Blueprint $table) {
+
             $table->id();
-            $table->unsignedBigInteger('equipment_id');
-            $table->unsignedBigInteger('exercise_id');
-            $table->timestamps();
-            $table->foreign('equipment_id')->references('id')->on('equipment')->onDelete('cascade');
-            $table->foreign('exercise_id')->references('id')->on('exercises')->onDelete('cascade');
-            $table->unique(['equipment_id', 'exercise_id']);
+
+            /*
+            |----------------------------------
+            | Relations
+            |----------------------------------
+            */
+
+            $table->foreignId('equipment_id')
+                ->constrained('equipments')
+                ->cascadeOnDelete();
+
+            $table->foreignId('exercise_id')
+                ->constrained('exercises')
+                ->cascadeOnDelete();
+
+            /*
+            |----------------------------------
+            | Prevent Duplicate Mapping
+            |----------------------------------
+            */
+
+            $table->unique(
+                ['equipment_id', 'exercise_id'],
+                'equipment_exercise_unique'
+            );
+
+            /*
+            |----------------------------------
+            | PostgreSQL Safe Timestamps
+            |----------------------------------
+            */
+
+            $table->timestampsTz();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('equipment_exercise');

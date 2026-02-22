@@ -6,34 +6,63 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('trainers', function (Blueprint $table) {
-            $table->id();
-            $table->string('location');
-            $table->longText('bio');
-            $table->longText('services');
-            $table->boolean('active')->default(false);
-            $table->boolean('is_super')->default(false);
-            
-            $table->unsignedBigInteger('user_id')->unique(); // define unique first
-        
+
+            /*
+            |----------------------------------
+            | Primary Key
+            |----------------------------------
+            */
+            $table->bigIncrements('id');
+
+            /*
+            |----------------------------------
+            | Trainer Profile Data
+            |----------------------------------
+            */
+
+            $table->string('location', 150)->index();
+
+            // Long text fields (PostgreSQL handles this efficiently)
+            $table->longText('bio')->nullable();
+            $table->longText('services')->nullable();
+
+            /*
+            |----------------------------------
+            | Status Flags
+            |----------------------------------
+            */
+
+            $table->boolean('active')->default(false)->index();
+            $table->boolean('is_super')->default(false)->index();
+
+            /*
+            |----------------------------------
+            | Relations
+            |----------------------------------
+            */
+
+            $table->unsignedBigInteger('user_id')->unique();
+
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
-                ->onDelete('cascade'); // define foreign key separately
-        
-            $table->timestamps();
+                ->onDelete('cascade');
+
+            /*
+            |----------------------------------
+            | PostgreSQL Safe Timestamp
+            |----------------------------------
+            */
+
+            $table->timestampTz('created_at')->useCurrent();
+            $table->timestampTz('updated_at')->nullable();
+
         });
-        
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('trainers');

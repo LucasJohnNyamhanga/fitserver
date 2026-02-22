@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('equipment', function (Blueprint $table) {
-            $table->id();
-            $table->string('jina');
-            $table->string('picha');
-            $table->timestamps();
+        Schema::create('equipments', function (Blueprint $table) {
+
+            $table->id(); // bigIncrements automatically
+
+            // Indexed once only
+            $table->string('jina', 150)->index();
+
+            $table->string('picha', 255);
+
+            $table->timestampsTz(); // PostgreSQL safe
         });
     }
 
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('equipment');
+        Schema::dropIfExists('equipments');
     }
 };

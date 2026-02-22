@@ -6,30 +6,75 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('packages', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->longText('description');
-            $table->longText('expectation');
-            $table->string('image');
-            $table->string('target');
-            $table->integer('price');
-            $table->decimal('rating')->default(0);
-            $table->boolean('active')->default(false);
-            $table->unsignedBigInteger('trainer_id');
-            $table->foreign('trainer_id')->references('id')->on('trainers')->onDelete('cascade');
-            $table->timestamps();
+
+            /*
+            |----------------------------------
+            | Primary Key
+            |----------------------------------
+            */
+            $table->bigIncrements('id');
+
+            /*
+            |----------------------------------
+            | Package Content
+            |----------------------------------
+            */
+
+            $table->string('title', 150)->index();
+
+            $table->longText('description')->nullable();
+            $table->longText('expectation')->nullable();
+
+            $table->string('image', 255)->nullable();
+            $table->string('target', 100)->index();
+
+            /*
+            |----------------------------------
+            | Pricing & Rating
+            |----------------------------------
+            */
+
+            // Use decimal precision for money
+            $table->decimal('price', 10, 2)->default(0);
+
+            // Rating precision (0 - 5 scale recommended)
+            $table->decimal('rating', 3, 2)->default(0);
+
+            /*
+            |----------------------------------
+            | Status
+            |----------------------------------
+            */
+
+            $table->boolean('active')->default(false)->index();
+
+            /*
+            |----------------------------------
+            | Relations
+            |----------------------------------
+            */
+
+            $table->unsignedBigInteger('trainer_id')->index();
+
+            $table->foreign('trainer_id')
+                ->references('id')
+                ->on('trainers')
+                ->onDelete('cascade');
+
+            /*
+            |----------------------------------
+            | Timestamp (PostgreSQL Safe)
+            |----------------------------------
+            */
+
+            $table->timestampTz('created_at')->useCurrent();
+            $table->timestampTz('updated_at')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('packages');

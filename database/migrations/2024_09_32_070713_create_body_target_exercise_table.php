@@ -6,25 +6,61 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('body_target_exercise', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('body_target_id');
-            $table->foreign('body_target_id')->references('id')->on('body_targets')->onDelete('cascade');
-            $table->unsignedBigInteger('exercise_id');
-            $table->foreign('exercise_id')->references('id')->on('exercises')->onDelete('cascade');
-            $table->timestamps();
+
+            /*
+            |----------------------------------
+            | Primary Key
+            |----------------------------------
+            */
+            $table->bigIncrements('id');
+
+            /*
+            |----------------------------------
+            | Relations
+            |----------------------------------
+            */
+
+            $table->unsignedBigInteger('body_target_id')->index();
+            $table->unsignedBigInteger('exercise_id')->index();
+
+            /*
+            |----------------------------------
+            | Foreign Keys
+            |----------------------------------
+            */
+
+            $table->foreign('body_target_id')
+                ->references('id')
+                ->on('body_targets')
+                ->onDelete('cascade');
+
+            $table->foreign('exercise_id')
+                ->references('id')
+                ->on('exercises')
+                ->onDelete('cascade');
+
+            /*
+            |----------------------------------
+            | Prevent Duplicate Mapping
+            |----------------------------------
+            */
+
             $table->unique(['body_target_id', 'exercise_id']);
+
+            /*
+            |----------------------------------
+            | Timestamp (PostgreSQL Safe)
+            |----------------------------------
+            */
+
+            $table->timestampTz('created_at')->useCurrent();
+            $table->timestampTz('updated_at')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('body_target_exercise');

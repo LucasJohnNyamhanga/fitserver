@@ -12,11 +12,40 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('body_targets', function (Blueprint $table) {
-            $table->id();
-            $table->string('jina');
-            $table->string('picha');
-            $table->boolean('active')->default(false);
-            $table->timestamps();
+
+            /*
+            |----------------------------------
+            | Primary Key
+            |----------------------------------
+            */
+            $table->bigIncrements('id');
+
+            /*
+            |----------------------------------
+            | Body Target Fields
+            |----------------------------------
+            */
+
+            $table->string('name', 150);
+            $table->longText('description')->nullable();
+
+            $table->boolean('active')->default(true);
+
+            /*
+            |----------------------------------
+            | Explicit Index (PostgreSQL Safe)
+            |----------------------------------
+            */
+            $table->index('active', 'bt_active_idx');
+            $table->index('name', 'bt_name_idx');
+
+            /*
+            |----------------------------------
+            | Timestamp (Timezone Safe)
+            |----------------------------------
+            */
+            $table->timestampTz('created_at')->useCurrent();
+            $table->timestampTz('updated_at')->nullable();
         });
     }
 
