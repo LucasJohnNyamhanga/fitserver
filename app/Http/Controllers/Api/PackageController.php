@@ -255,4 +255,37 @@ class PackageController extends Controller
 
         return response()->json(['message' => 'Package has been successfully updated.'], 200);
     }
+
+    public function search(PackageRequest $request)
+    {
+        $keyword = $request->input('keyword');
+        $perPage = min($request->input('per_page', 15), 50);
+
+        $query = Package::query()
+            ->where('active', true)
+            ->select([
+                'id',
+                'title',
+                'price',
+                'rating',
+                'target',
+                'created_at'
+            ]);
+
+        if ($keyword) {
+            $query->selectRaw("
+                ts_rank_cd(search_vector, plainto_tsquery('simple', ?)) AS rank
+            ", [$keyword])
+            ->whereRaw("
+                search_vector @@ plainto_tsquery('simple', ?)
+            ", [$keyword])
+            ->orderByDesc('rank');
+        } else {
+            $query->orderByDesc('created_at');
+        }
+
+        return response()->json(
+            $query->paginate($perPage)
+        );
+    }
 }
