@@ -98,17 +98,27 @@ class ExcerciseController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+            return response()->json([
+                'message' => 'Fill in all empty fields',
+                'errors' => $validator->errors()
+            ], 400);
         }
 
         $id = $request->input('id');
 
-        $exercise = Exercise::with(['bodyTarget' => function ($query) {
-                $query->latest()->take(10);
-            },'equipment' => function ($query) {
-                $query->latest()->take(10);
-            }])->where('id', $id)
-            ->first();
+        $exercise = Exercise::with([
+            'bodyTarget' => function ($query) {
+                $query->orderBy('body_targets.created_at', 'desc')
+                    ->take(10);
+            },
+            'equipment' => function ($query) {
+                $query->orderBy('equipments.created_at', 'desc')
+                    ->take(10);
+            }
+        ])
+        ->where('id', $id)
+        ->first();
+
         return response()->json([
             'exercise' => $exercise,
         ], 200);

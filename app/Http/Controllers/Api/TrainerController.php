@@ -31,7 +31,7 @@ class TrainerController extends Controller
             'location' => $address,
             'bio' => $bio,
             'services' => $services,
-            'active' => true,
+            'active' => false,
             'is_super' => false,
             'user_id' => Auth::id(),
             ]);

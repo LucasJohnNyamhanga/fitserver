@@ -23,15 +23,15 @@ class BodyTargetController extends Controller
             return response()->json(['message' => 'Fill in all empty fields'], 400);
         }
 
-        $existingBodyTarget = BodyTarget::where('jina', $jina)->first();
+        $existingBodyTarget = BodyTarget::where('name', $jina)->first();
 
         if ($existingBodyTarget) {
             return response()->json(['message' => 'Body Part already available.'], 409);
         }
 
         $bodyTarget = BodyTarget::create([
-            'jina' => $jina,
-            'picha' => $picha,
+            'name' => $jina,
+            'image' => $picha,
         ]);
 
         return response()->json(['message' => 'Body Part has been successfully saved to database.'], 200);
@@ -48,26 +48,26 @@ class BodyTargetController extends Controller
     {
         $userId = Auth::id();
 
-        // Load only active BodyTargets that have at least one exercise from a super trainer
+        // Load BodyTargets with exercises
         $bodyTarget = BodyTarget::with(['exercises' => function ($query) {
-                $query->where('active', true)
-                    ->latest()
+                $query->where('exercises.active', true)
+                    ->orderBy('exercises.created_at', 'desc')
                     ->take(30);
             }])
             ->where('active', true)
             ->whereHas('exercises.trainer', function ($query) {
-                $query->where('is_super', true); // Only from super trainers
+                $query->where('is_super', true);
             })
             ->get();
 
-        // Helper query to fetch packages by target
+        // Base query for packages
         $basePackageQuery = function ($target) use ($userId) {
             return Package::where('target', $target)
                 ->where('active', true)
                 ->whereDoesntHave('purchases', function ($query) use ($userId) {
-                    $query->where('user_id', $userId); // Not already purchased
+                    $query->where('user_id', $userId);
                 })
-                ->latest()
+                ->orderBy('created_at', 'desc')
                 ->take(30)
                 ->get();
         };
@@ -111,26 +111,28 @@ class BodyTargetController extends Controller
     {
         $bodyPartId = $request->id;
 
-        // Retrieve the authenticated trainer
         $trainer = Trainer::where('user_id', Auth::id())->first();
 
-        if($trainer){
+        if ($trainer) {
+
             $bodyTarget = BodyTarget::with([
                 'exercises' => function ($query) use ($trainer) {
                     $query->where('trainer_id', $trainer->id)
-                        ->latest()
+                        ->orderBy('exercises.created_at', 'desc') // ✅ fix ambiguity
                         ->take(5);
-                    }])
-                ->where('id', $bodyPartId)
-                ->first();
+                }
+            ])
+            ->where('id', $bodyPartId)
+            ->first();
+
             return response()->json([
                 'bodyTarget' => $bodyTarget,
             ], 200);
         }
 
         return response()->json([
-                'message' => 'Your not a trainer',
-            ], 500);
+            'message' => "You're not a trainer",
+        ], 500);
     }
 
     public function editBodyTarget(BodyTypeRequest $request)

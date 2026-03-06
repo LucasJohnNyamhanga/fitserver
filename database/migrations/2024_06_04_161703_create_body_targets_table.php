@@ -28,7 +28,7 @@ return new class extends Migration
 
             $table->string('name', 150);
             $table->longText('description')->nullable();
-
+            $table->string('image');
             $table->boolean('active')->default(true);
 
             /*

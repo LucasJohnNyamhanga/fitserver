@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Equipment extends Model
 {
+    protected $table = 'equipments';
     use HasFactory;
 
     public function exercises(): BelongsToMany

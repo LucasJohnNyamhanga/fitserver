@@ -35,23 +35,28 @@ class EquipmentController extends Controller
 
     public function getEquipmentWithExercises(EquipmentRequest $request)
     {
-         $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Fill in all empty fields', 'errors' => $validator->errors()], 400);
+            return response()->json([
+                'message' => 'Fill in all empty fields',
+                'errors' => $validator->errors()
+            ], 400);
         }
 
-
         $id = $request->input('id');
-        $bodyTarget = Equipment::with(['exercises' => function ($query) {
-                $query->latest()->take(10);
+
+        $equipment = Equipment::with(['exercises' => function ($query) {
+                $query->orderBy('exercises.created_at', 'desc')
+                    ->take(10);
             }])
             ->where('id', $id)
             ->first();
+
         return response()->json([
-            'equipments' => $bodyTarget,
+            'equipments' => $equipment,
         ], 200);
     }
 

@@ -262,24 +262,30 @@ class PackageController extends Controller
         $perPage = min($request->input('per_page', 15), 50);
 
         $query = Package::query()
-            ->where('active', true)
-            ->select([
-                'id',
-                'title',
-                'price',
-                'rating',
-                'target',
-                'created_at'
-            ]);
+            ->where('active', true);
 
         if ($keyword) {
+
             $query->selectRaw("
                 ts_rank_cd(search_vector, plainto_tsquery('simple', ?)) AS rank
             ", [$keyword])
-            ->whereRaw("
-                search_vector @@ plainto_tsquery('simple', ?)
-            ", [$keyword])
+
+            ->where(function ($q) use ($keyword) {
+
+                // Text search
+                $q->whereRaw("
+                    search_vector @@ plainto_tsquery('simple', ?)
+                ", [$keyword]);
+
+                // Price search (only if keyword is numeric)
+                if (is_numeric($keyword)) {
+                    $q->orWhere('price', $keyword);
+                }
+
+            })
+
             ->orderByDesc('rank');
+
         } else {
             $query->orderByDesc('created_at');
         }
