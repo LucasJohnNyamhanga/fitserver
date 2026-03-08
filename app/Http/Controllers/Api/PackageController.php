@@ -24,7 +24,7 @@ class PackageController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Fill in all empty fields', 
+                'message' => 'Fill in all empty fields',
                 'errors' => $validator->errors()
             ], 400);
         }
@@ -97,7 +97,7 @@ class PackageController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' =>$e->getMessage(),
+                'message' => $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -107,7 +107,7 @@ class PackageController extends Controller
     {
         $id = $request->id;
         try {
-            $package = Package::with(['meals', 'exercises','trainer.user'])->where('id', $id)->first();
+            $package = Package::with(['meals', 'exercises', 'trainer.user'])->where('id', $id)->first();
             if (!$package) {
                 return response()->json(['message' => 'Package not found.'], 404);
             }
@@ -115,7 +115,7 @@ class PackageController extends Controller
             return response()->json(['package' => $package], 200);
         } catch (\Exception $e) {
 
-            return response()->json(['message' => 'An error occurred while fetching the package. '. $e->getMessage()], 500);
+            return response()->json(['message' => 'An error occurred while fetching the package. ' . $e->getMessage()], 500);
         }
     }
 
@@ -258,34 +258,34 @@ class PackageController extends Controller
 
     public function search(PackageRequest $request)
     {
-        $keyword = $request->input('keyword');
+        $keyword = trim($request->input('search') ?? '');
         $perPage = min($request->input('per_page', 15), 50);
 
-        $query = Package::query()
-            ->where('active', true);
+        $query = Package::where('active', true);
 
-        if ($keyword) {
+        if ($keyword !== '') {
 
-            $query->selectRaw("
-                ts_rank_cd(search_vector, plainto_tsquery('simple', ?)) AS rank
-            ", [$keyword])
+            if (is_numeric($keyword)) {
 
-            ->where(function ($q) use ($keyword) {
+                // search exact price
+                $query->where('price', (float) $keyword)
+                    ->orderBy('price');
 
-                // Text search
-                $q->whereRaw("
-                    search_vector @@ plainto_tsquery('simple', ?)
-                ", [$keyword]);
+            } else {
 
-                // Price search (only if keyword is numeric)
-                if (is_numeric($keyword)) {
-                    $q->orWhere('price', $keyword);
-                }
-
-            })
-
-            ->orderByDesc('rank');
-
+                $query->selectRaw("
+                    packages.*,
+                    ts_rank(
+                        to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(description,'')),
+                        plainto_tsquery('simple', ?)
+                    ) AS rank
+                ", [$keyword])
+                    ->whereRaw("
+                    to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(description,'')) 
+                    @@ plainto_tsquery('simple', ?)
+                ", [$keyword])
+                    ->orderByDesc('rank');
+            }
         } else {
             $query->orderByDesc('created_at');
         }
