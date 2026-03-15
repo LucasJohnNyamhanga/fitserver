@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('logout', [AuthController::class, 'logout']); 
     Route::post('storeBodyTarget', [BodyTargetController::class, 'storeBodyTarget']);
-    Route::post("upload", [UploadController::class, 'upload']);
+    Route::post("upload", [UploadController::class, 'uploadImage']);
     Route::post('storeExcercise', [ExcerciseController::class, 'storeExcercise']);
     Route::post('storeEquipment', [EquipmentController::class, 'storeEquipment']);
     Route::get('getBodyListAndEquipments', [BodyTargetController::class, 'getBodyListAndEquipments']);
